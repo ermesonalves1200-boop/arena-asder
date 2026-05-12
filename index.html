@@ -12,22 +12,22 @@
   <!-- FIREBASE - cole aqui os dados do seu projeto Firebase -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
-  apiKey: "AIzaSyBbXMW8qx9WEnmzuCmubcxq63yS5NqUmGA",
-  authDomain: "arena-asder.firebaseapp.com",
-  projectId: "arena-asder",
-  storageBucket: "arena-asder.firebasestorage.app",
-  messagingSenderId: "635746425945",
-  appId: "1:635746425945:web:57f627db3060fb587de548"
-};
+      apiKey: "COLE_SUA_API_KEY_AQUI",
+      authDomain: "COLE_SEU_AUTH_DOMAIN_AQUI",
+      projectId: "COLE_SEU_PROJECT_ID_AQUI",
+      storageBucket: "COLE_SEU_STORAGE_BUCKET_AQUI",
+      messagingSenderId: "COLE_SEU_SENDER_ID_AQUI",
+      appId: "COLE_SEU_APP_ID_AQUI"
+    };
 
     try {
       const app = initializeApp(firebaseConfig);
       window.db = getFirestore(app);
       window.firebaseAtivo = true;
-      window.firebaseFuncoes = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc };
+      window.firebaseFuncoes = { collection, addDoc, getDocs, deleteDoc, doc, updateDoc, setDoc, getDoc };
       console.log("Firebase conectado!");
     } catch (erro) {
       window.firebaseAtivo = false;
@@ -461,9 +461,58 @@
     const horariosSemana = ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
     const horariosSabado = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
 
-    function salvarDados() {
+    async function salvarDados() {
       localStorage.setItem('timesArenaAsder', JSON.stringify(times));
       localStorage.setItem('reservasArenaAsder', JSON.stringify(reservas));
+
+      if (window.firebaseAtivo && window.db && window.firebaseFuncoes) {
+        try {
+          const { doc, setDoc } = window.firebaseFuncoes;
+          await setDoc(doc(window.db, 'arena_asder', 'dados_principais'), {
+            times,
+            reservas,
+            atualizadoEm: new Date().toISOString()
+          });
+          console.log('Dados salvos no Firebase!');
+        } catch (erro) {
+          console.error('Erro ao salvar no Firebase:', erro);
+        }
+      }
+    }
+
+    async function carregarDadosFirebase() {
+      let tentativas = 0;
+
+      while (!window.firebaseAtivo && tentativas < 20) {
+        await new Promise(resolve => setTimeout(resolve, 300));
+        tentativas++;
+      }
+
+      if (window.firebaseAtivo && window.db && window.firebaseFuncoes) {
+        try {
+          const { doc, getDoc } = window.firebaseFuncoes;
+          const documento = await getDoc(doc(window.db, 'arena_asder', 'dados_principais'));
+
+          if (documento.exists()) {
+            const dados = documento.data();
+            times = dados.times || [];
+            reservas = dados.reservas || [];
+
+            localStorage.setItem('timesArenaAsder', JSON.stringify(times));
+            localStorage.setItem('reservasArenaAsder', JSON.stringify(reservas));
+            console.log('Dados carregados do Firebase!');
+          } else {
+            console.log('Nenhum dado encontrado no Firebase. Usando dados locais.');
+          }
+        } catch (erro) {
+          console.error('Erro ao carregar dados do Firebase:', erro);
+        }
+      }
+    }
+
+    async function iniciarSistema() {
+      await carregarDadosFirebase();
+      iniciarSistema();
     }
 
     function formatarDinheiro(valor) {
