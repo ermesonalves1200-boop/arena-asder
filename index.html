@@ -411,8 +411,76 @@
         return;
       }
       times.forEach(t => {
-        div.innerHTML += `<div class="list-item"><strong>${t.nome}</strong><br>Responsável: ${t.responsavel}<br>WhatsApp: ${t.telefone}<br>${t.obs || ''}</div>`;
+        div.innerHTML += `
+          <div class="list-item">
+            <strong>${t.nome}</strong><br>
+            Responsável: ${t.responsavel}<br>
+            WhatsApp: ${t.telefone}<br>
+            ${t.obs || ''}
+            <div class="actions">
+              <button class="btn-warning" onclick="editarTime(${t.id})">Editar cadastro</button>
+              <button class="btn-danger" onclick="excluirTime(${t.id})">Excluir cadastro</button>
+            </div>
+          </div>
+        `;
       });
+    }
+
+    async function editarTime(id) {
+      const time = buscarTime(id);
+      if (!time) return alert('Time não encontrado.');
+
+      const novoNome = prompt('Nome do time:', time.nome);
+      if (novoNome === null) return;
+
+      const novoResponsavel = prompt('Responsável:', time.responsavel);
+      if (novoResponsavel === null) return;
+
+      const novoTelefone = prompt('Telefone/WhatsApp:', time.telefone);
+      if (novoTelefone === null) return;
+
+      const novaObs = prompt('Observações:', time.obs || '');
+      if (novaObs === null) return;
+
+      if (!novoNome.trim() || !novoResponsavel.trim() || !novoTelefone.trim()) {
+        alert('Nome do time, responsável e telefone não podem ficar vazios.');
+        return;
+      }
+
+      times = times.map(t => t.id === id ? {
+        ...t,
+        nome: novoNome.trim(),
+        responsavel: novoResponsavel.trim(),
+        telefone: novoTelefone.trim(),
+        obs: novaObs.trim()
+      } : t);
+
+      await salvarDados();
+      atualizarTela();
+      alert('Cadastro editado e salvo na nuvem com sucesso!');
+    }
+
+    async function excluirTime(id) {
+      const time = buscarTime(id);
+      if (!time) return alert('Time não encontrado.');
+
+      const possuiReserva = reservas.some(r => r.timeId === id);
+      let mensagem = `Deseja realmente excluir o cadastro do time "${time.nome}"?`;
+
+      if (possuiReserva) {
+        mensagem += '
+
+Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas dele também serão apagadas.';
+      }
+
+      if (!confirm(mensagem)) return;
+
+      times = times.filter(t => t.id !== id);
+      reservas = reservas.filter(r => r.timeId !== id);
+
+      await salvarDados();
+      atualizarTela();
+      alert('Cadastro excluído da nuvem com sucesso!');
     }
 
     function atualizarListaReservas() {
