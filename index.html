@@ -1,4 +1,4 @@
-|<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
@@ -29,7 +29,6 @@
       window.firebaseSetDoc = setDoc;
       window.firebaseGetDoc = getDoc;
       console.log("Firebase conectado!");
-      window.dispatchEvent(new Event("firebasePronto"));
     } catch (erro) {
       window.firebaseOk = false;
       console.error("Erro ao conectar Firebase:", erro);
@@ -40,10 +39,6 @@
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, Helvetica, sans-serif; }
     body { background: linear-gradient(135deg, #001b3f, #075dcc); color: white; min-height: 100vh; padding: 20px; }
     .container { max-width: 1300px; margin: auto; }
-    .login-screen { position: fixed; inset: 0; background: linear-gradient(135deg, #001b3f, #075dcc); display: flex; align-items: center; justify-content: center; z-index: 9999; padding: 20px; }
-    .login-box { width: 100%; max-width: 420px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25); border-radius: 24px; padding: 30px; text-align: center; box-shadow: 0 20px 50px rgba(0,0,0,.35); }
-    .login-box h1 { margin-bottom: 10px; font-size: 30px; }
-    .login-box p { margin-bottom: 18px; color: #dcecff; }
     header { text-align: center; padding: 28px; margin-bottom: 25px; background: rgba(255,255,255,.13); border: 1px solid rgba(255,255,255,.22); border-radius: 22px; box-shadow: 0 10px 25px rgba(0,0,0,.25); }
     header h1 { font-size: 36px; margin-bottom: 8px; }
     header p { color: #e4f0ff; margin-bottom: 12px; }
@@ -81,23 +76,12 @@
     @media (max-width: 650px) { body { padding: 10px; } header h1 { font-size: 28px; } .summary { grid-template-columns: repeat(2, 1fr); } .summary-box strong { font-size: 26px; } }
   </style>
 </head>
-<body>
-  <div class="login-screen" id="loginScreen" style="display:none;">
-    <div class="login-box">
-      <h1>⚽ Arena ASDER</h1>
-      <p>Área administrativa</p>
-      <input type="text" id="loginUsuario" placeholder="Usuário">
-      <input type="password" id="loginSenha" placeholder="Senha">
-      <button class="btn-primary" onclick="fazerLogin()">Entrar no sistema</button>
-      <p style="font-size:12px;margin-top:12px;">Usuário: admin | Senha: arena2026</p>
-    </div>
-  </div>
 
-  <div class="container" id="sistemaPrincipal" style="display:block;">
+<body>
+  <div class="container" id="sistemaPrincipal">
     <header>
       <h1>⚽ Arena ASDER Society</h1>
       <p>Agenda Digital de Jogos Fixos, Avulsos, Pagamentos, Contratos e Pix</p>
-      <button class="btn-danger" onclick="sairSistema()">Sair do sistema</button>
       <button class="btn-success" onclick="enviarLinkSistemaWhatsApp()">Enviar link no WhatsApp</button>
     </header>
 
@@ -162,7 +146,12 @@
         <select id="contratoReserva"></select>
         <button class="btn-dark" onclick="gerarContratoPDF()">Gerar contrato em PDF</button>
         <button class="btn-warning" onclick="gerarMensagemWhatsApp()">Mensagem WhatsApp</button>
-        <div class="rules"><strong>Regras principais:</strong><br>Pagamento antecipado, comprovante como chave de acesso, proibição de bebidas de fora e consumo obrigatório no bar da casa.</div>
+
+        <div class="rules">
+          <strong>Regras principais:</strong><br>
+          Pagamento antecipado, comprovante como chave de acesso, proibição de bebidas de fora e consumo obrigatório no bar da casa.
+        </div>
+
         <h2 style="margin-top:18px;">💳 Pix da Reserva</h2>
         <label>Chave Pix da Associação</label>
         <input type="text" id="chavePix" value="83598151000110">
@@ -198,27 +187,9 @@
     const horariosSemana = ['18:00', '19:00', '20:00', '21:00', '22:00', '23:00'];
     const horariosSabado = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
 
-    function fazerLogin() {
-      const usuario = document.getElementById('loginUsuario').value.trim();
-      const senha = document.getElementById('loginSenha').value.trim();
-      if (usuario === 'admin' && senha === 'arena2026') {
-        localStorage.setItem('arenaLogado', 'sim');
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('sistemaPrincipal').style.display = 'block';
-        iniciarSistema();
-      } else {
-        alert('Usuário ou senha incorretos.');
-      }
-    }
-
-    function sairSistema() {
-      localStorage.removeItem('arenaLogado');
-      location.reload();
-    }
-
     function enviarLinkSistemaWhatsApp() {
-      const linkSistema = 'https://arena-asder.vercel.app/?v=100';
-      const mensagem = `⚽ ARENA ASDER SOCIETY%0A%0AAcesse o sistema online:%0A${linkSistema}%0A%0ALogin:%0AUsuário: admin%0ASenha: arena2026`;
+      const linkSistema = 'https://arena-asder.vercel.app/?v=3000';
+      const mensagem = `⚽ ARENA ASDER SOCIETY%0A%0AAcesse o sistema online:%0A${linkSistema}`;
       window.open(`https://wa.me/?text=${mensagem}`, '_blank');
     }
 
@@ -232,6 +203,7 @@
 
     async function salvarDados() {
       const ok = await esperarFirebase();
+
       if (!ok) {
         alert('Firebase não conectou. Verifique a internet.');
         return;
@@ -255,6 +227,7 @@
 
     async function carregarDadosFirebase() {
       const ok = await esperarFirebase();
+
       if (!ok) {
         console.warn('Firebase não conectou para carregar dados.');
         atualizarTela();
@@ -265,19 +238,20 @@
         const snap = await window.firebaseGetDoc(
           window.firebaseDoc(window.db, 'arena_asder', 'dados_principais')
         );
+
         if (snap.exists()) {
           const dados = snap.data();
           times = dados.times || [];
           reservas = dados.reservas || [];
           console.log('Dados carregados do Firebase!');
         } else {
-          console.log('Firebase vazio. Começando novo banco.');
           times = [];
           reservas = [];
         }
       } catch (erro) {
         console.error('Erro ao carregar Firebase:', erro);
       }
+
       atualizarTela();
     }
 
@@ -308,134 +282,18 @@
       document.getElementById('responsavel').value = '';
       document.getElementById('telefone').value = '';
       document.getElementById('obsTime').value = '';
+
       atualizarTela();
       alert('Time cadastrado e salvo na nuvem com sucesso!');
     }
 
-    function atualizarValor() {
-      const tipo = document.getElementById('tipoReserva').value;
-      document.getElementById('valorReserva').value = tipo === 'fixo' ? 'R$ 780,00' : 'R$ 270,00';
-    }
-
-    function atualizarHorarios() {
-      const dia = document.getElementById('diaSemana').value;
-      const select = document.getElementById('horarioReserva');
-      select.innerHTML = '';
-      const horarios = dia === 'Sábado' ? horariosSabado : horariosSemana;
-      horarios.forEach(h => {
-        const option = document.createElement('option');
-        option.value = h;
-        option.textContent = h;
-        select.appendChild(option);
-      });
-    }
-
-    async function criarReserva() {
-      const timeId = Number(document.getElementById('reservaTime').value);
-      const tipo = document.getElementById('tipoReserva').value;
-      const dia = document.getElementById('diaSemana').value;
-      const data = document.getElementById('dataReserva').value;
-      const horario = document.getElementById('horarioReserva').value;
-      const status = document.getElementById('statusPagamento').value;
-      const valor = tipo === 'fixo' ? 780 : 270;
-
-      if (!timeId || !data || !horario) {
-        alert('Preencha todos os dados da reserva.');
-        return;
-      }
-
-      const ocupado = reservas.some(r => r.dia === dia && r.horario === horario);
-      if (ocupado) {
-        alert('RESERVADO – NÃO DISPONÍVEL 🔒');
-        return;
-      }
-
-      reservas.push({ id: Date.now(), timeId, tipo, dia, data, horario, status, valor });
-      await salvarDados();
-      atualizarTela();
-      alert('Reserva salva na nuvem com sucesso!');
-    }
-
-    async function excluirReserva(id) {
-      if (!confirm('Deseja realmente excluir esta reserva?')) return;
-      reservas = reservas.filter(r => r.id !== id);
-      await salvarDados();
-      atualizarTela();
-    }
-
-    async function confirmarPagamento(id) {
-      reservas = reservas.map(r => r.id === id ? { ...r, status: 'pago' } : r);
-      await salvarDados();
-      atualizarTela();
-    }
-
-    function buscarTime(id) { return times.find(t => t.id === id); }
-
-    function atualizarTela() {
-      atualizarSelectTimes();
-      atualizarSelectContratos();
-      atualizarListaTimes();
-      atualizarListaReservas();
-      montarAgenda();
-      atualizarResumo();
-    }
-
-    function atualizarSelectTimes() {
-      const select = document.getElementById('reservaTime');
-      select.innerHTML = '<option value="">Selecione um time</option>';
-      times.forEach(t => {
-        const option = document.createElement('option');
-        option.value = t.id;
-        option.textContent = `${t.nome} - ${t.responsavel}`;
-        select.appendChild(option);
-      });
-    }
-
-    function atualizarSelectContratos() {
-      const select = document.getElementById('contratoReserva');
-      select.innerHTML = '<option value="">Selecione uma reserva fixa</option>';
-      reservas.filter(r => r.tipo === 'fixo').forEach(r => {
-        const time = buscarTime(r.timeId);
-        const option = document.createElement('option');
-        option.value = r.id;
-        option.textContent = `${time?.nome || 'Time'} - ${r.dia} às ${r.horario}`;
-        select.appendChild(option);
-      });
-    }
-
-    function atualizarListaTimes() {
-      const div = document.getElementById('listaTimes');
-      div.innerHTML = '';
-      if (times.length === 0) {
-        div.innerHTML = '<p>Nenhum time cadastrado.</p>';
-        return;
-      }
-      times.forEach(t => {
-        div.innerHTML += `
-          <div class="list-item">
-            <strong>${t.nome}</strong><br>
-            Responsável: ${t.responsavel}<br>
-            WhatsApp: ${t.telefone}<br>
-            ${t.obs || ''}
-            <br><br>
-
-<button onclick="editarTime(${t.id})"
-style="background:#f0ad4e;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-right:5px;">
-Editar
-</button>
-
-<button onclick="excluirTime(${t.id})"
-style="background:#dc3545;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;">
-Excluir
-</button>
-          </div>
-        `;
-      });
-    }
-
     async function editarTime(id) {
       const time = buscarTime(id);
-      if (!time) return alert('Time não encontrado.');
+
+      if (!time) {
+        alert('Time não encontrado.');
+        return;
+      }
 
       const novoNome = prompt('Nome do time:', time.nome);
       if (novoNome === null) return;
@@ -464,20 +322,24 @@ Excluir
 
       await salvarDados();
       atualizarTela();
+
       alert('Cadastro editado e salvo na nuvem com sucesso!');
     }
 
     async function excluirTime(id) {
       const time = buscarTime(id);
-      if (!time) return alert('Time não encontrado.');
+
+      if (!time) {
+        alert('Time não encontrado.');
+        return;
+      }
 
       const possuiReserva = reservas.some(r => r.timeId === id);
+
       let mensagem = `Deseja realmente excluir o cadastro do time "${time.nome}"?`;
 
       if (possuiReserva) {
-        mensagem += '
-
-Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas dele também serão apagadas.';
+        mensagem += '\n\nAtenção: este time possui reservas cadastradas. Ao excluir o time, as reservas dele também serão apagadas.';
       }
 
       if (!confirm(mensagem)) return;
@@ -487,44 +349,199 @@ Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas
 
       await salvarDados();
       atualizarTela();
+
       alert('Cadastro excluído da nuvem com sucesso!');
+    }
+
+    function atualizarValor() {
+      const tipo = document.getElementById('tipoReserva').value;
+      document.getElementById('valorReserva').value = tipo === 'fixo' ? 'R$ 780,00' : 'R$ 270,00';
+    }
+
+    function atualizarHorarios() {
+      const dia = document.getElementById('diaSemana').value;
+      const select = document.getElementById('horarioReserva');
+      select.innerHTML = '';
+
+      const horarios = dia === 'Sábado' ? horariosSabado : horariosSemana;
+
+      horarios.forEach(h => {
+        const option = document.createElement('option');
+        option.value = h;
+        option.textContent = h;
+        select.appendChild(option);
+      });
+    }
+
+    async function criarReserva() {
+      const timeId = Number(document.getElementById('reservaTime').value);
+      const tipo = document.getElementById('tipoReserva').value;
+      const dia = document.getElementById('diaSemana').value;
+      const data = document.getElementById('dataReserva').value;
+      const horario = document.getElementById('horarioReserva').value;
+      const status = document.getElementById('statusPagamento').value;
+      const valor = tipo === 'fixo' ? 780 : 270;
+
+      if (!timeId || !data || !horario) {
+        alert('Preencha todos os dados da reserva.');
+        return;
+      }
+
+      const ocupado = reservas.some(r => r.dia === dia && r.horario === horario);
+
+      if (ocupado) {
+        alert('RESERVADO – NÃO DISPONÍVEL 🔒');
+        return;
+      }
+
+      reservas.push({ id: Date.now(), timeId, tipo, dia, data, horario, status, valor });
+      await salvarDados();
+      atualizarTela();
+
+      alert('Reserva salva na nuvem com sucesso!');
+    }
+
+    async function excluirReserva(id) {
+      if (!confirm('Deseja realmente excluir esta reserva?')) return;
+
+      reservas = reservas.filter(r => r.id !== id);
+
+      await salvarDados();
+      atualizarTela();
+    }
+
+    async function confirmarPagamento(id) {
+      reservas = reservas.map(r => r.id === id ? { ...r, status: 'pago' } : r);
+
+      await salvarDados();
+      atualizarTela();
+    }
+
+    function buscarTime(id) {
+      return times.find(t => t.id === id);
+    }
+
+    function atualizarTela() {
+      atualizarSelectTimes();
+      atualizarSelectContratos();
+      atualizarListaTimes();
+      atualizarListaReservas();
+      montarAgenda();
+      atualizarResumo();
+    }
+
+    function atualizarSelectTimes() {
+      const select = document.getElementById('reservaTime');
+      select.innerHTML = '<option value="">Selecione um time</option>';
+
+      times.forEach(t => {
+        const option = document.createElement('option');
+        option.value = t.id;
+        option.textContent = `${t.nome} - ${t.responsavel}`;
+        select.appendChild(option);
+      });
+    }
+
+    function atualizarSelectContratos() {
+      const select = document.getElementById('contratoReserva');
+      select.innerHTML = '<option value="">Selecione uma reserva fixa</option>';
+
+      reservas.filter(r => r.tipo === 'fixo').forEach(r => {
+        const time = buscarTime(r.timeId);
+        const option = document.createElement('option');
+        option.value = r.id;
+        option.textContent = `${time?.nome || 'Time'} - ${r.dia} às ${r.horario}`;
+        select.appendChild(option);
+      });
+    }
+
+    function atualizarListaTimes() {
+      const div = document.getElementById('listaTimes');
+      div.innerHTML = '';
+
+      if (times.length === 0) {
+        div.innerHTML = '<p>Nenhum time cadastrado.</p>';
+        return;
+      }
+
+      times.forEach(t => {
+        div.innerHTML += `
+          <div class="list-item">
+            <strong>${t.nome}</strong><br>
+            Responsável: ${t.responsavel}<br>
+            WhatsApp: ${t.telefone}<br>
+            ${t.obs || ''}
+
+            <div class="actions">
+              <button class="btn-warning" onclick="editarTime(${t.id})">Editar</button>
+              <button class="btn-danger" onclick="excluirTime(${t.id})">Excluir</button>
+            </div>
+          </div>
+        `;
+      });
     }
 
     function atualizarListaReservas() {
       const div = document.getElementById('listaReservas');
       div.innerHTML = '';
+
       if (reservas.length === 0) {
         div.innerHTML = '<p>Nenhuma reserva cadastrada.</p>';
         return;
       }
+
       reservas.forEach(r => {
         const time = buscarTime(r.timeId);
         const statusTexto = r.status === 'pago' ? 'Pago ✅' : r.status === 'aguardando' ? 'Aguardando comprovante 🕒' : 'Pendente ⚠️';
-        div.innerHTML += `<div class="list-item"><strong>${time?.nome || 'Time removido'}</strong><br>${r.dia} - ${r.data} - ${r.horario}<br>Tipo: ${r.tipo === 'fixo' ? 'Mensal/Fixo' : 'Avulso'}<br>Valor: ${formatarDinheiro(r.valor)}<br>Status: ${statusTexto}<div class="actions"><button class="btn-success" onclick="confirmarPagamento(${r.id})">Confirmar pagamento</button><button class="btn-danger" onclick="excluirReserva(${r.id})">Excluir</button></div></div>`;
+
+        div.innerHTML += `
+          <div class="list-item">
+            <strong>${time?.nome || 'Time removido'}</strong><br>
+            ${r.dia} - ${r.data} - ${r.horario}<br>
+            Tipo: ${r.tipo === 'fixo' ? 'Mensal/Fixo' : 'Avulso'}<br>
+            Valor: ${formatarDinheiro(r.valor)}<br>
+            Status: ${statusTexto}
+
+            <div class="actions">
+              <button class="btn-success" onclick="confirmarPagamento(${r.id})">Confirmar pagamento</button>
+              <button class="btn-danger" onclick="excluirReserva(${r.id})">Excluir</button>
+            </div>
+          </div>
+        `;
       });
     }
 
     function montarAgenda() {
       const tabela = document.getElementById('agendaTabela');
       const todosHorarios = ['09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','18:00','19:00','20:00','21:00','22:00','23:00'];
+
       let html = '<tr><th>Horário</th>';
+
       dias.forEach(d => html += `<th>${d}</th>`);
+
       html += '</tr>';
 
       todosHorarios.forEach(h => {
         html += `<tr><td><strong>${h}</strong></td>`;
+
         dias.forEach(dia => {
           const horarioValido = dia === 'Sábado' ? horariosSabado.includes(h) : horariosSemana.includes(h);
           const reserva = reservas.find(r => r.dia === dia && r.horario === h);
-          if (!horarioValido) html += `<td><div class="slot bloqueado">Fechado 🔒</div></td>`;
-          else if (reserva) {
+
+          if (!horarioValido) {
+            html += `<td><div class="slot bloqueado">Fechado 🔒</div></td>`;
+          } else if (reserva) {
             const time = buscarTime(reserva.timeId);
             const classe = reserva.status === 'pago' ? (reserva.tipo === 'fixo' ? 'fixo' : 'ocupado') : 'pendente';
             html += `<td><div class="slot ${classe}">${time?.nome || 'Reservado'}<br>${reserva.tipo === 'fixo' ? 'Fixo' : 'Avulso'}</div></td>`;
-          } else html += `<td><div class="slot livre">Livre ✅</div></td>`;
+          } else {
+            html += `<td><div class="slot livre">Livre ✅</div></td>`;
+          }
         });
+
         html += '</tr>';
       });
+
       tabela.innerHTML = html;
     }
 
@@ -538,21 +555,39 @@ Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas
 
     function gerarContratoPDF() {
       const reservaId = Number(document.getElementById('contratoReserva').value);
-      if (!reservaId) return alert('Selecione uma reserva fixa.');
+
+      if (!reservaId) {
+        alert('Selecione uma reserva fixa.');
+        return;
+      }
+
       const reserva = reservas.find(r => r.id === reservaId);
       const time = buscarTime(reserva.timeId);
+
+      if (!reserva || !time) {
+        alert('Reserva ou time não encontrado.');
+        return;
+      }
+
       const { jsPDF } = window.jspdf;
       const doc = new jsPDF();
+
       let y = 20;
+
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(18);
       doc.text('ARENA ASDER SOCIETY', 105, y, { align: 'center' });
+
       y += 12;
+
       doc.setFontSize(14);
       doc.text('CONTRATO DE HORÁRIO FIXO', 105, y, { align: 'center' });
+
       y += 15;
+
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(11);
+
       const linhas = [
         `Data de emissão: ${new Date().toLocaleDateString('pt-BR')}`,
         `Time: ${time.nome}`,
@@ -571,43 +606,76 @@ Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas
         '6. Danos ao espaço poderão ser cobrados do responsável.',
         '7. Alterações devem ser comunicadas previamente à administração.'
       ];
-      linhas.forEach(l => { doc.text(doc.splitTextToSize(l, 180), 15, y); y += 7; });
+
+      linhas.forEach(l => {
+        doc.text(doc.splitTextToSize(l, 180), 15, y);
+        y += 7;
+      });
+
       y += 15;
+
       doc.text('__________________________________', 15, y);
       doc.text('Responsável pelo time', 25, y + 7);
       doc.text('__________________________________', 115, y);
       doc.text('Administração Arena ASDER', 122, y + 7);
+
       doc.save(`Contrato_${time.nome.replaceAll(' ', '_')}.pdf`);
     }
 
     function gerarMensagemWhatsApp() {
       const reservaId = Number(document.getElementById('contratoReserva').value);
-      if (!reservaId) return alert('Selecione uma reserva fixa.');
+
+      if (!reservaId) {
+        alert('Selecione uma reserva fixa.');
+        return;
+      }
+
       const reserva = reservas.find(r => r.id === reservaId);
       const time = buscarTime(reserva.timeId);
+
+      if (!reserva || !time) {
+        alert('Reserva ou time não encontrado.');
+        return;
+      }
+
       const mensagem = `Olá, ${time.responsavel}!%0A%0ASua reserva fixa na Arena ASDER Society está confirmada:%0A%0ATime: ${time.nome}%0ADia fixo: ${reserva.dia}%0AHorário: ${reserva.horario}%0AValor mensal: R$ 780,00%0A%0AEnvie o comprovante de pagamento, pois ele é a chave de acesso ao gramado.%0A%0AÉ proibido trazer bebidas de fora.%0AObrigado!`;
+
       window.open(`https://wa.me/55${time.telefone}?text=${mensagem}`, '_blank');
     }
 
     function gerarPixQRCode() {
       const reservaId = Number(document.getElementById('contratoReserva').value);
       const chavePix = document.getElementById('chavePix').value.trim();
-      if (!reservaId) return alert('Selecione uma reserva fixa para gerar o Pix.');
+
+      if (!reservaId) {
+        alert('Selecione uma reserva fixa para gerar o Pix.');
+        return;
+      }
+
       const reserva = reservas.find(r => r.id === reservaId);
       const time = buscarTime(reserva.timeId);
+
+      if (!reserva || !time) {
+        alert('Reserva ou time não encontrado.');
+        return;
+      }
+
       const textoPix = `PIX ARENA ASDER - Chave: ${chavePix} - Valor: ${formatarDinheiro(reserva.valor)} - Time: ${time.nome}`;
+
       document.getElementById('pixTexto').style.display = 'block';
       document.getElementById('pixTexto').innerHTML = `<strong>Pix gerado:</strong><br>Chave: ${chavePix}<br>Valor: ${formatarDinheiro(reserva.valor)}<br>Time: ${time.nome}`;
-      document.getElementById('qrcode').innerHTML = '';
-      new QRCode(document.getElementById('qrcode'), { text: textoPix, width: 160, height: 160 });
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-  document.getElementById('loginScreen').style.display = 'none';
-  document.getElementById('sistemaPrincipal').style.display = 'block';
-  iniciarSistema();
-});
 
-    
+      document.getElementById('qrcode').innerHTML = '';
+
+      new QRCode(document.getElementById('qrcode'), {
+        text: textoPix,
+        width: 160,
+        height: 160
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      iniciarSistema();
     });
   </script>
 </body>
