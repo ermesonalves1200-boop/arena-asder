@@ -601,14 +601,13 @@ Atenção: este time possui reservas cadastradas. Ao excluir o time, as reservas
       document.getElementById('qrcode').innerHTML = '';
       new QRCode(document.getElementById('qrcode'), { text: textoPix, width: 160, height: 160 });
     }
-
     document.addEventListener('DOMContentLoaded', () => {
-      atualizarHorarios();
-      if (localStorage.getItem('arenaLogado') === 'sim') {
-        document.getElementById('loginScreen').style.display = 'none';
-        document.getElementById('sistemaPrincipal').style.display = 'block';
-        iniciarSistema();
-      }
+  document.getElementById('loginScreen').style.display = 'none';
+  document.getElementById('sistemaPrincipal').style.display = 'block';
+  iniciarSistema();
+});
+
+    
     });
   </script>
 </body>
