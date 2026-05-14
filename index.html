@@ -417,10 +417,17 @@
             Responsável: ${t.responsavel}<br>
             WhatsApp: ${t.telefone}<br>
             ${t.obs || ''}
-            <div class="actions">
-              <button class="btn-warning" onclick="editarTime(${t.id})">Editar cadastro</button>
-              <button class="btn-danger" onclick="excluirTime(${t.id})">Excluir cadastro</button>
-            </div>
+            <br><br>
+
+<button onclick="editarTime(${t.id})"
+style="background:#f0ad4e;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;margin-right:5px;">
+Editar
+</button>
+
+<button onclick="excluirTime(${t.id})"
+style="background:#dc3545;color:white;border:none;padding:8px 12px;border-radius:8px;cursor:pointer;">
+Excluir
+</button>
           </div>
         `;
       });
