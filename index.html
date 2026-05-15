@@ -503,12 +503,11 @@
             Status: ${statusTexto}
 
             <div class="actions">
-              <button class="btn-success" onclick="confirmarPagamento(${r.id})">Confirmar pagamento</button>
-              <button class="btn-danger" onclick="excluirReserva(${r.id})">Excluir</button>
-            </div>
-          </div>
-        `;
-      });
+  <button class="btn-success" onclick="confirmarPagamento(${r.id})">Confirmar pagamento</button>
+  <button class="btn-danger" onclick="excluirReserva(${r.id})">Excluir</button>
+  <button class="btn-warning" onclick="cobrarWhatsApp(${r.id})">Cobrar no WhatsApp</button>
+</div>
+`;
     }
 
     function montarAgenda() {
