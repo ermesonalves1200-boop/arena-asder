@@ -638,7 +638,7 @@
         return;
       }
 
-      const mensagem = `🚨 AVISO IMPORTANTE – PAGAMENTO EM ATRASO 🚨%0A%0AOlá, ${time.responsavel}! ⚽%0A%0AIdentificamos que o pagamento do horário fixo referente ao mês atual ainda não foi localizado em nosso sistema.%0A%0A📌 Informações do horário:%0A• Time: ${time.nome}%0A• Dia: ${reserva.dia}%0A• Horário: ${reserva.horario}%0A• Valor mensal: R$ 780,00%0A%0A⚠️ Conforme as regras da Arena ASDER Society, os pagamentos deverão ser realizados até o dia 10 de cada mês.%0A%0APedimos a gentileza de regularizar a pendência e enviar o comprovante de pagamento o quanto antes.%0A%0A💳 PIX DA ASSOCIAÇÃO:%0A83598151000110%0A%0A❗ Horários com pagamentos em aberto poderão ser disponibilizados para outros times interessados.%0A%0AArena ASDER Society 🤝⚽`;
+      const mensagem = `Olá, ${time.responsavel}.%0A%0APassando para lembrar sobre o pagamento do horário fixo da Arena ASDER Society.%0A%0ATime: ${time.nome}%0ADia: ${reserva.dia}%0AHorário: ${reserva.horario}%0AValor mensal: R$ 780,00%0A%0APedimos a gentileza de realizar o pagamento e enviar o comprovante.%0A%0AChave PIX:%0A83598151000110%0A%0AMantenha seu horário sempre em dia para garantir sua vaga fixa na agenda.%0A%0AA ASDER agradece pela parceria e compreensão.%0A%0AArena ASDER Society`;
 
       window.open(`https://wa.me/55${time.telefone}?text=${mensagem}`, '_blank');
     }
